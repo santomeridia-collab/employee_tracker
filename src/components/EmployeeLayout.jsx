@@ -1,6 +1,6 @@
 // src/components/EmployeeLayout.jsx
 import React from "react";
-import { LogOut, Home, ClipboardList, User, Clock, Bell, Settings } from "lucide-react";
+import { LogOut, Home, ClipboardList, User, Clock, Bell } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 
 const EmployeeLayout = ({ children, activeItem, setActiveItem }) => {
@@ -8,12 +8,15 @@ const EmployeeLayout = ({ children, activeItem, setActiveItem }) => {
 
   const menuItems = [
     { id: "home", label: "Dashboard", icon: <Home size={18} /> },
-    { id: "session", label: "Work Session", icon: <Clock size={18} /> },
+    // { id: "session", label: "Work Session", icon: <Clock size={18} /> },
     { id: "tasks", label: "My Tasks", icon: <ClipboardList size={18} /> },
+
+    // ✅ ADDED Notifications
     { id: "notifications", label: "Notifications", icon: <Bell size={18} /> },
-    { id: "attendance", label: "Attendance", icon: <Clock size={18} /> },
-    { id: "profile", label: "Profile", icon: <User size={18} /> },
-    { id: "settings", label: "Settings", icon: <Settings size={18} /> },
+
+    // { id: "attendance", label: "Attendance", icon: <Clock size={18} /> },
+      { id: "profile", label: "Profile", icon: <User size={18} /> },
+    
   ];
 
   return (
@@ -21,20 +24,10 @@ const EmployeeLayout = ({ children, activeItem, setActiveItem }) => {
 
       {/* Sidebar */}
       <div className="w-64 bg-white shadow-xl p-5 flex flex-col">
+        <h2 className="text-2xl font-bold text-indigo-600 mb-8">
+          Employee Panel
+        </h2>
 
-        {/* ✅ COMPANY LOGO + NAME */}
-        <div className="flex flex-col items-center mb-8">
-          <img 
-            src="/logo.png" 
-            alt="Company Logo"
-            className="w-20 h-20 object-contain mb-2"
-          />
-          <h2 className="text-xl font-bold text-indigo-600 text-center">
-            SantoMeridia
-          </h2>
-        </div>
-
-        {/* Menu */}
         {menuItems.map((item) => (
           <button
             key={item.id}

@@ -38,33 +38,56 @@ const TaskManagement = () => {
   };
 
   const handleAddTask = async (e) => {
-    e.preventDefault();
-    if (!newTask.title || !newTask.assignedTo) return alert("Title and Assigned Employee are required.");
+  e.preventDefault();
+  if (!newTask.title || !newTask.assignedTo)
+    return alert("Title and Assigned Employee are required.");
 
-    setIsSubmitting(true); // START LOADING
+  setIsSubmitting(true);
 
-    try {
-      await addDoc(collection(db, 'tasks'), {
-        ...newTask,
-        status: 'pending',
-        createdAt: serverTs(),
-        history: [{ action: "assigned", timestamp: new Date().toISOString() }],
-        startedAt: null,
-        pausedAt: null,
-        resumedAt: null,
-        completedAt: null,
-      });
+  try {
+    // 1️⃣ Store the task
+    const taskRef = await addDoc(collection(db, "tasks"), {
+      ...newTask,
+      status: "pending",
+      createdAt: serverTs(),
+      history: [
+        { action: "assigned", timestamp: new Date().toISOString() },
+      ],
+      startedAt: null,
+      pausedAt: null,
+      resumedAt: null,
+      completedAt: null,
+    });
 
-      alert(`Task "${newTask.title}" assigned successfully!`);
-      setIsModalOpen(false);
-      setNewTask({ title: '', description: '', deadline: '', priority: 'medium', assignedTo: '' });
-    } catch (error) {
-      console.error("Error assigning task:", error);
-      alert(`Failed to assign task: ${error.message}`);
-    } finally {
-        setIsSubmitting(false); // STOP LOADING
-    }
-  };
+    // 2️⃣ Create notification for employee
+    await addDoc(collection(db, "notifications"), {
+      userId: newTask.assignedTo,
+      taskId: taskRef.id,
+      title: "New Task Assigned",
+      message: `A new task (${newTask.title}) has been assigned to you.`,
+      type: "task_assign",
+      createdAt: Date.now(),
+      seen: false,
+    });
+
+    alert(`Task "${newTask.title}" assigned successfully!`);
+    setIsModalOpen(false);
+
+    setNewTask({
+      title: "",
+      description: "",
+      deadline: "",
+      priority: "medium",
+      assignedTo: "",
+    });
+  } catch (error) {
+    console.error("Error assigning task:", error);
+    alert(`Failed to assign task: ${error.message}`);
+  } finally {
+    setIsSubmitting(false);
+  }
+};
+
 
   const getStatusDisplay = (status) => {
     switch (status) {

@@ -14,34 +14,57 @@ function Login() {
 
   // Hardcoded admin credentials
   const adminEmail = "admin@company.com";
-  const adminPassword = "Admin123"; // replace with your desired password
+  const adminPassword = "Admin123";
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
     setLoading(true);
 
+    console.log("🔵 LOGIN ATTEMPT");
+    console.log("➡️ Email:", email);
+    console.log("➡️ Password Entered:", password);
+
     try {
       // 1. Check if admin credentials
       if (email === adminEmail && password === adminPassword) {
+        console.log("🟢 Admin matched using hardcoded credentials");
         nav("/admin");
         return;
       }
 
       // 2. Normal user login with Firebase Auth
       const cred = await signInWithEmailAndPassword(auth, email, password);
+      console.log("🟢 Firebase Login Successful");
+      console.log("👤 User UID:", cred.user.uid);
 
-      // 3. Get user role from Firestore
-      const snap = await getDoc(doc(db, "users", cred.user.uid));
+      // 3. Fetch role from Firestore
+      const userRef = doc(db, "users", cred.user.uid);
+      const snap = await getDoc(userRef);
+
+      if (snap.exists()) {
+        console.log("📄 Firestore User Data:", snap.data());
+      } else {
+        console.log("⚠️ No user document found in Firestore, assigning role: employee");
+      }
+
       const role = snap.exists() ? snap.data().role : "employee";
+      console.log("🔵 User Role:", role);
 
-      if (role === "admin") nav("/admin");
-      else nav("/employee");
+      // 4. Navigate based on role
+      if (role === "admin") {
+        console.log("➡️ Navigating to /admin");
+        nav("/admin");
+      } else {
+        console.log("➡️ Navigating to /employee");
+        nav("/employee");
+      }
     } catch (err) {
-      console.error(err);
+      console.error("❌ LOGIN ERROR:", err);
       setError("Login failed. Please check your credentials.");
     } finally {
       setLoading(false);
+      console.log("🔚 Login process complete");
     }
   };
 
@@ -106,7 +129,7 @@ function Login() {
         </p>
 
         <p className="mt-4 text-center text-gray-400 dark:text-gray-500 text-xs">
-          Employee Tracker &copy; 2025. All rights reserved.
+          Employee Tracker © 2025. All rights reserved.
         </p>
       </div>
     </div>

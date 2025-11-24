@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.17",
+    "dayjs": "^1.11.19",
     "firebase": "^12.6.0",
     "lucide-react": "^0.554.0",
     "react": "^19.2.0",
